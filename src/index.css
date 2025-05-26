@@ -1,3 +1,18 @@
 .background-primary {
   background-color: #552c2c;
 }
+
+div .main-container {
+  min-height: fit-content;
+  /* background-color: #947d7d; */
+  /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); */
+}
+
+br {
+  border: solid 1px black;
+}
+
+.tbl-fixed {
+  overflow: auto;
+  max-height: 75vh;
+}
