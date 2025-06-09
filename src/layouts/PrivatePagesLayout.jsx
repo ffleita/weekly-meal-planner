@@ -5,7 +5,9 @@ export const PrivatePagesLayout = ({children}) => {
     return (
         <>
             <NavigationBar />
-            {children}
+            <div className='container'>
+                {children}
+            </div>
         </>
     )
 }
