@@ -9,11 +9,11 @@ export const NavigationBar = () => {
     return (
         <nav className="navbar navbar-dark bg-dark">
             <div className="container-fluid">
-                <a className="navbar-brand" href="#">WMP</a>
+                <NavLink to="/" className="nav-link navbar-brand">Weekly Meal Planner</NavLink>
                 <button className="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar" aria-label="Toggle navigation">
                     <span className="navbar-toggler-icon"></span>
                 </button>
-                <div className="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
+                <div className="offcanvas offcanvas-end text-bg-dark" tabIndex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
                     <div className="offcanvas-header">
                         <h5 className="offcanvas-title" id="offcanvasDarkNavbarLabel">Planificador de comidas semanales</h5>
                         <button type="button" className="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -23,22 +23,22 @@ export const NavigationBar = () => {
                             <li className="nav-item">
                                 <NavLink to="/" className={"nav-link"} >Planes semanales</NavLink>
                             </li>
-                            <li className="nav-item dropdown">
-                                <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    ABMs
-                                </a>
-                                <ul className="dropdown-menu dropdown-menu-dark">
-                                    <li><NavLink to="/recetas" className={"dropdown-item"} >Recetas</NavLink></li>
-                                    <li><NavLink to="/mis-recetas" className={"dropdown-item"} >Mis recetas</NavLink></li>
-                                    <li>
-                                        <hr className="dropdown-divider" />
-                                    </li>
-                                </ul>
+                            <li className='nav-item'>
+                                <NavLink to="/planes" key="plan-link" className={"nav-link"} >Planes</NavLink>
                             </li>
+                            <li className='nav-item'>
+                                <NavLink to="/recetas" key="recetas-link" className={"nav-link"} >Recetas</NavLink>
+                            </li>
+                            <li className='nav-item'>
+                                <NavLink to="/ingredientes" key="ingredientes-link" className={"nav-link"} >Ingredientes</NavLink>
+                            </li>
+                            {/* <li>
+                                        <hr className="dropdown-divider" />
+                                    </li> */}
                         </ul>
                     </div>
                 </div>
             </div>
-        </nav>
+        </nav >
     )
 }

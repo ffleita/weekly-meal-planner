@@ -16,3 +16,7 @@ br {
   overflow: auto;
   max-height: 75vh;
 }
+
+.botonera-principal {
+  height: 100px;
+}
