@@ -1,92 +1,104 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { PrivatePagesLayout } from '../layouts/PrivatePagesLayout'
 import { useNavigate } from 'react-router-dom'
+import { useIsMobile } from '../hooks/isMobile'
 
 const recetasData = [
     {
         idReceta: 1,
-        nombre: 'Rissoto1',
-        username: 'ffleitas'
+        nombre: 'Rissoto'
     },
     {
         idReceta: 2,
-        nombre: 'Rissoto2',
-        username: 'ffleitas'
+        nombre: 'Sopa de letras'
     },
     {
         idReceta: 3,
-        nombre: 'Rissoto3',
-        username: 'ffleitas'
-    },
-    {
-        idReceta: 4,
-        nombre: 'Rissoto4',
-        username: 'ffleitas'
-    },
-    {
-        idReceta: 5,
-        nombre: 'Rissoto5',
-        username: 'ffleitas'
-    },
-    {
-        idReceta: 6,
-        nombre: 'Rissoto6',
-        username: 'ffleitas'
-    },
-    {
-        idReceta: 7,
-        nombre: 'Rissoto7',
-        username: 'ffleitas'
-    },
-    {
-        idReceta: 8,
-        nombre: 'Rissoto8',
-        username: 'ffleitas'
-    },
+        nombre: 'Deserunt nisi fugiat proident quis excepteur. Adipisicing elit occaecat Lorem ullamco aliqua ad exercitation labore do non irure ad. Cupidatat consectetur enim laboris proident ex amet adipisicing officia laborum consequat.'
+    }
 ]
 
 export const RecetasPage = () => {
 
     const navigate = useNavigate();
 
-    const handleClick = (event) => {
+    const isMobile = useIsMobile();
+
+    const [searchTerm, setSearchTerm] = useState('')
+
+    const handleClickEditarReceta = (event) => {
         event.preventDefault();
-        if (!event.target.parentElement?.parentElement?.id) return;
-        navigate(`/recetas/${event.target.parentElement.parentElement.id}`);
+        if (!event.target.dataset.id) return;
+        navigate(`/recetas/editar-receta/${event.target.dataset.id}`);
+    }
+
+    const handleClickVerInfo = (e) => {
+        e.preventDefault();
+        if (!e.target.dataset.id) return;
+        navigate(`/recetas/${e.target.dataset.id}`);
+    }
+
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+    }
+
+    const recetasFiltradas = recetasData.filter(receta =>
+        receta.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const handleNuevaReceta = (e) => {
+        e.preventDefault();
+        navigate('/recetas/crear-receta')
+    }
+
+    const handleGoBack = (e) => {
+        e.preventDefault();
+        navigate(-1);
     }
 
     return (
         <PrivatePagesLayout>
-            <div className='container-fluid main-container'>
-                <br />
-                <h1 className='text-center'>ABM de Recetas</h1>
-                <hr />
-                <div className='container tbl-container'>
-                    <div className='table tbl-fixed'>
-                        <table className='table table-striped table-bordered text-center'>
-                            <thead>
-                                <tr>
-                                    <th scope='col'>#</th>
-                                    <th scope='col'>Nombre</th>
-                                    <th scope='col'>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {/* Aquí se pueden mapear las recetas desde un estado o props */}
-                                { recetasData?.map((receta) => (
-                                    <tr key={receta.idReceta} id={receta.idReceta}>
-                                        <th scope='row'>{receta.idReceta}</th>
-                                        <td>{receta.nombre}</td>
-                                        <td>
-                                            <button className='btn btn-primary' onClick={handleClick}>Editar</button>
-                                            <button className='btn btn-danger'>Eliminar</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                            
-                        </table>
-                    </div>
+            <br />
+            <h1>Recetas</h1>
+            <hr />
+            <div className='row g-2 align-items-center mb-3'>
+                <div className='col-10'>
+                    <input
+                        type='text'
+                        className='form-control'
+                        placeholder='Buscar por nombre de receta...'
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                    />
+                </div>
+                <div className='col-2 d-flex justify-content-end'>
+                    <button type='button' className='btn btn-primary w-100' onClick={handleNuevaReceta}>
+                        {!isMobile ? "Nueva receta" : <i className="bi bi-plus-square"></i>}
+                    </button>
+                </div>
+            </div>
+            <div className='tbl-fixed mb-3'>
+                <ul className='list-group'>
+                    {recetasFiltradas.map(receta => (
+                        <li className='list-group-item d-flex align-items-center justify-content-between' key={receta.idReceta}>
+                            <div className='flex-grow-1 pe-3'>{receta.nombre}</div>
+                            <div class="col-2 dropdown">
+                                <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    {isMobile ? (<i class="bi bi-three-dots-vertical"></i>) : 'Acciones'}
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a className='dropdown-item' data-id={receta.idReceta} onClick={handleClickVerInfo}>Ver detalle</a></li>
+                                    <li><a className='dropdown-item' data-id={receta.idReceta} onClick={handleClickEditarReceta}>Editar receta</a></li>
+                                    <li><a className='dropdown-item' >Eliminar</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+            <div className='row d-flex justify-content-end'>
+                <div className='col-sm-12 col-md-2'>
+                    <button type='button' className='btn btn-secondary w-100' onClick={handleGoBack}>Regresar</button>
                 </div>
             </div>
         </PrivatePagesLayout>
