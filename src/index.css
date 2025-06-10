@@ -12,11 +12,17 @@ br {
   border: solid 1px black;
 }
 
-.tbl-fixed {
-  overflow: auto;
-  max-height: 75vh;
-}
-
 .botonera-principal {
   height: 100px;
+}
+
+.fixed-table {
+  max-height: calc(100vh - 300px);
+}
+
+.fixed-table thead th {
+  position: sticky;
+  top: -1px;
+  background-color: #f8f9fa; /* Color similar al header de Bootstrap */
+  z-index: 10;
 }

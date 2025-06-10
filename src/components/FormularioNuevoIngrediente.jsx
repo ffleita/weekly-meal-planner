@@ -1,47 +1,69 @@
 import { useState } from "react";
 import { useForm } from "../hooks/useForm";
+import api from '../api/axiosInstance'
 
 
 const initialForm = {
-    name: ""
+    nombre: ""
 }
 
 const formValidations = {
-    name: [(value) => value.length >= 1, 'El nombre del ingrediente es obligatorio']
+    nombre: [(value) => value.length >= 1, 'El nombre del ingrediente es obligatorio']
 }
 
-export const FormularioNuevoIngrediente = ({handleGoBack}) => {
+export const FormularioNuevoIngrediente = ({ handleGoBack }) => {
 
-    const { formState, name, onInputChange, isFormValid, nameValid, onResetForm } = useForm(initialForm, formValidations);
+    const { formState, nombre, onInputChange, isFormValid, nombreValid, onResetForm } = useForm(initialForm, formValidations);
 
     const [formSubmitted, setFormSubmitted] = useState(false);
 
-    const handleAgregarIngrediente = (event) => {
+    const [loading, setLoading] = useState(false);
+
+    const [error, setError] = useState('');
+
+    const handleAgregarIngrediente = async (event) => {
         event.preventDefault();
-        console.log('Agregando ingrediente');
         setFormSubmitted(true);
-        console.log(isFormValid);
-
-        if (!isFormValid) return;
-
-        handleGoBack(event);
-        // lógica para guardar ingrediente aquí
+        setLoading(true);
+        setError('');
+        if (!isFormValid) {
+            onResetForm();
+            setLoading(false);
+            return;
+        };
+        try {
+            const response = await api.post("/ingredientes", formState);
+        } catch (err) {
+            setError(err.response?.data?.errorMessage);
+        }
+        setLoading(false);
     }
 
     return (
         <form onSubmit={handleAgregarIngrediente} onReset={onResetForm}>
             <div className="mb-3">
-                <label htmlFor="name" className="form-label">Nombre del Ingrediente</label>
+                <label htmlFor="nombre" className="form-label">Nombre del Ingrediente</label>
                 <input
                     type="text"
-                    className={`form-control ${nameValid && formSubmitted ? 'is-invalid' : ''}`}
-                    name="name"
+                    className={`form-control ${nombreValid && formSubmitted ? 'is-invalid' : ''}`}
+                    name="nombre"
                     id="nombreIngrediente"
                     placeholder="Ingrese un nombre para su ingrediente..."
-                    value={name}
+                    value={nombre}
                     onChange={onInputChange}
                 />
-                {nameValid && formSubmitted && <div className="invalid-feedback">{nameValid}</div>}
+                {nombreValid && formSubmitted && <div className="invalid-feedback">{nombreValid}</div>}
+            </div>
+            <div className="row mb-2">
+                <div className="col">
+                    {error && (<div
+                        class="alert alert-danger"
+                        role="alert"
+                    >
+                        {error}
+                    </div>)}
+
+                </div>
             </div>
             <div className='row d-flex justify-content-end g-2'>
                 <div className="col-sm-12 col-md-2">

@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { PrivatePagesLayout } from '../layouts/PrivatePagesLayout'
 import { useIsMobile } from '../hooks/isMobile'
 import { FormularioNuevoIngrediente } from '../components/FormularioNuevoIngrediente'
 import { useNavigate } from 'react-router-dom'
+import api from '../api/axiosInstance'
 
 const listadoIngredientes = [
     {
@@ -20,6 +21,22 @@ const listadoIngredientes = [
 ]
 
 export const IngredientesPage = () => {
+
+    const [listadoIngredientes, setListadoIngredientes] = useState([]);
+
+    useEffect(() => {
+        updateIngredientesList();
+    }, [])
+
+    
+    const updateIngredientesList = async() => {
+        try {
+            const response = await api.get("/ingredientes");
+            setListadoIngredientes(response.data.ingredientes)
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     const isMobile = useIsMobile();
 
@@ -83,28 +100,30 @@ export const IngredientesPage = () => {
                         </button>
                     </div>
                 </div>
-                <table className='table table-striped table-bordered text-center align-middle tbl-fixed'>
-                    <thead>
-                        <tr>
-                            <th className='col'>Ingrediente</th>
-                            <th className='col'>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {ingredientesFiltrados.map(ingrediente => (
+                <div className='table-responsive fixed-table overflow-auto'>
+                    <table className='table table-striped table-bordered text-center align-middle'>
+                        <thead>
                             <tr>
-                                <td scope='row'>{ingrediente.nombre}</td>
-                                <td>
-                                    <button className='btn btn-danger' data-id={ingrediente.id} onClick={handleEliminarIngrediente}>
-                                        {
-                                            isMobile ? (<i className="bi bi-trash"></i>) : ('Borrar')
-                                        }
-                                    </button>
-                                </td>
+                                <th className='col'>Ingrediente</th>
+                                <th className='col'>Acciones</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {ingredientesFiltrados.map(ingrediente => (
+                                <tr>
+                                    <td scope='row'>{ingrediente.nombre}</td>
+                                    <td>
+                                        <button className='btn btn-danger' data-id={ingrediente.id} onClick={handleEliminarIngrediente}>
+                                            {
+                                                isMobile ? (<i className="bi bi-trash"></i>) : ('Borrar')
+                                            }
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
                 <div className='row d-flex justify-content-end'>
                     <div className='col-sm-12 col-md-2'>
                         <button type='button' className='btn btn-secondary w-100' onClick={handleGoBack}>Regresar</button>
