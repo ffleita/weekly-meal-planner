@@ -5,21 +5,6 @@ import { FormularioNuevoIngrediente } from '../components/FormularioNuevoIngredi
 import { useNavigate } from 'react-router-dom'
 import api from '../api/axiosInstance'
 
-const listadoIngredientes = [
-    {
-        id: 1,
-        nombre: 'zanahoria'
-    },
-    {
-        id: 2,
-        nombre: 'mortadela'
-    },
-    {
-        id: 3,
-        nombre: 'queso danbo'
-    }
-]
-
 export const IngredientesPage = () => {
 
     const [listadoIngredientes, setListadoIngredientes] = useState([]);
@@ -46,11 +31,17 @@ export const IngredientesPage = () => {
 
     const [searchTerm, setSearchTerm] = useState('')
 
-    const handleEliminarIngrediente = (event) => {
+    const handleEliminarIngrediente = async(event) => {
         event.preventDefault();
         const target = event.currentTarget;
         const id = target?.dataset?.id;
         console.log('Eliminando ingrediente con id', id);
+        try {
+            await api.delete(`/ingredientes/${id}`);
+            updateIngredientesList();
+        } catch (error) {
+            console.error('Error al eliminar el ingrediente:', error);
+        }
         // hacer un post para eliminar ingrediente
     }
 

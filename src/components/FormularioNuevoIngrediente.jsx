@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useForm } from "../hooks/useForm";
 import api from '../api/axiosInstance'
+import { useNavigate } from "react-router-dom";
 
 
 const initialForm = {
@@ -33,6 +34,7 @@ export const FormularioNuevoIngrediente = ({ handleGoBack }) => {
         };
         try {
             const response = await api.post("/ingredientes", formState);
+            handleGoBack();
         } catch (err) {
             setError(err.response?.data?.errorMessage);
         }
