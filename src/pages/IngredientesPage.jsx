@@ -91,7 +91,7 @@ export const IngredientesPage = () => {
                         </button>
                     </div>
                 </div>
-                <div className='table-responsive fixed-table overflow-auto'>
+                <div className='table-responsive fixed-table overflow-auto mb-3'>
                     <table className='table table-striped table-bordered text-center align-middle'>
                         <thead>
                             <tr>

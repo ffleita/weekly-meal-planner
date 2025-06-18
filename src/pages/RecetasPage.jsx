@@ -1,22 +1,8 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { PrivatePagesLayout } from '../layouts/PrivatePagesLayout'
 import { useNavigate } from 'react-router-dom'
 import { useIsMobile } from '../hooks/isMobile'
-
-const recetasData = [
-    {
-        idReceta: 1,
-        nombre: 'Rissoto'
-    },
-    {
-        idReceta: 2,
-        nombre: 'Sopa de letras'
-    },
-    {
-        idReceta: 3,
-        nombre: 'Deserunt nisi fugiat proident quis excepteur. Adipisicing elit occaecat Lorem ullamco aliqua ad exercitation labore do non irure ad. Cupidatat consectetur enim laboris proident ex amet adipisicing officia laborum consequat.'
-    }
-]
+import api from '../api/axiosInstance'
 
 export const RecetasPage = () => {
 
@@ -25,6 +11,26 @@ export const RecetasPage = () => {
     const isMobile = useIsMobile();
 
     const [searchTerm, setSearchTerm] = useState('')
+
+    const [listadoRecetas, setListadoRecetas] = useState([])
+
+    const [loadingError, setLoadingError] = useState("")
+
+    const updateListadoRecetas = async() => {
+        try {
+            setLoadingError("");
+            const response = await api.get('/recetas');
+            setListadoRecetas(response.data);
+        } catch (error) {
+            console.error('Error al obtener las recetas:', error);   
+            setLoadingError(error.message)
+        }
+    }
+
+    useEffect(() => {
+      updateListadoRecetas();
+    }, [])
+    
 
     const handleClickEditarReceta = (event) => {
         event.preventDefault();
@@ -42,7 +48,7 @@ export const RecetasPage = () => {
         setSearchTerm(e.target.value);
     }
 
-    const recetasFiltradas = recetasData.filter(receta =>
+    const recetasFiltradas = listadoRecetas.filter(receta =>
         receta.nombre.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
@@ -77,18 +83,19 @@ export const RecetasPage = () => {
                     </button>
                 </div>
             </div>
+            {loadingError && <div className='alert alert-danger mb-3'>{loadingError}</div>}
             <div className='tbl-fixed mb-3'>
                 <ul className='list-group'>
                     {recetasFiltradas.map(receta => (
-                        <li className='list-group-item d-flex align-items-center justify-content-between' key={receta.idReceta}>
+                        <li className='list-group-item d-flex align-items-center justify-content-between' key={receta.id}>
                             <div className='flex-grow-1 pe-3'>{receta.nombre}</div>
                             <div class="col-2 dropdown">
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     {isMobile ? (<i class="bi bi-three-dots-vertical"></i>) : 'Acciones'}
                                 </button>
                                 <ul class="dropdown-menu">
-                                    <li><a className='dropdown-item' data-id={receta.idReceta} onClick={handleClickVerInfo}>Ver detalle</a></li>
-                                    <li><a className='dropdown-item' data-id={receta.idReceta} onClick={handleClickEditarReceta}>Editar receta</a></li>
+                                    <li><a className='dropdown-item' data-id={receta.id} onClick={handleClickVerInfo}>Ver detalle</a></li>
+                                    <li><a className='dropdown-item' data-id={receta.id} onClick={handleClickEditarReceta}>Editar receta</a></li>
                                     <li><a className='dropdown-item' >Eliminar</a></li>
                                 </ul>
                             </div>
