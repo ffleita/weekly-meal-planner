@@ -34,7 +34,6 @@ export const IngredientesPage = () => {
         event.preventDefault();
         const target = event.currentTarget;
         const id = target?.dataset?.id;
-        console.log('Eliminando ingrediente con id', id);
         try {
             await api.delete(`/ingredientes/${id}`);
             updateIngredientesList();
@@ -42,7 +41,6 @@ export const IngredientesPage = () => {
         } catch (error) {
             console.error('Error al eliminar el ingrediente:', error);
         }
-        // hacer un post para eliminar ingrediente
     }
 
     const handleClickCrearIngrediente = (event) => {

@@ -34,7 +34,7 @@ export const FormularioNuevoIngrediente = () => {
             return;
         };
         try {
-            const response = await api.post("/ingredientes", formState);
+            await api.post("/ingredientes", formState);
             navigate('/ingredientes?creationSucceded=true');
         } catch (err) {
             setError(err.message);
@@ -79,7 +79,7 @@ export const FormularioNuevoIngrediente = () => {
                 </div>
                 <div className='row d-flex justify-content-end g-2'>
                     <div className="col-sm-12 col-md-2">
-                        <button type="submit" className="btn btn-primary w-100">Crear</button>
+                        <button type="submit" className="btn btn-primary w-100" disabled={loading}>{loading ? (<span class="spinner-border spinner-border-sm" aria-hidden="true"></span>) : ''}Crear</button>
                     </div>
                     <div className="col-sm-12 col-md-2">
                         <button type="button" className="btn btn-secondary w-100" onClick={handleGoBack}>Regresar</button>
