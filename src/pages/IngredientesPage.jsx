@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { PrivatePagesLayout } from '../layouts/PrivatePagesLayout'
 import { useIsMobile } from '../hooks/isMobile'
-import { FormularioNuevoIngrediente } from '../components/FormularioNuevoIngrediente'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import api from '../api/axiosInstance'
 
@@ -9,12 +8,11 @@ export const IngredientesPage = () => {
 
     const [params, setParams] = useSearchParams();
 
-    const [creationSucceded, setCreationSucceded] = useState(params.get('creationSucceded'))
-
     const [listadoIngredientes, setListadoIngredientes] = useState([]);
-    const [showCreationForm, setShowCreationForm] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [showCreationAlert, setShowCreationAlert] = useState(!!params.get('creationSucceded'));
+    const [showModificationAlert, setShowModificationAlert] = useState(!!params.get('modificationSucceded'));
+    const [showEliminationAlert, setShowEliminationAlert] = useState(false);
 
     const isMobile = useIsMobile();
     const navigate = useNavigate();
@@ -40,6 +38,7 @@ export const IngredientesPage = () => {
         try {
             await api.delete(`/ingredientes/${id}`);
             updateIngredientesList();
+            setShowEliminationAlert(true);
         } catch (error) {
             console.error('Error al eliminar el ingrediente:', error);
         }
@@ -49,12 +48,6 @@ export const IngredientesPage = () => {
     const handleClickCrearIngrediente = (event) => {
         event.preventDefault();
         navigate('/ingredientes/crear-ingrediente')
-    }
-
-    const handleShowList = (event) => {
-        event.preventDefault();
-        setShowCreationForm(false);
-        updateIngredientesList();
     }
 
     const handleGoBack = (e) => {
@@ -68,7 +61,17 @@ export const IngredientesPage = () => {
 
     const handleCloseAlert = (e) => {
         e.preventDefault();
+        setParams({});
         setShowCreationAlert(false);
+        setShowModificationAlert(false);
+        setShowEliminationAlert(false);
+    }
+
+    const handleEditarIngrediente = (e) => {
+        e.preventDefault();
+        const target = e.currentTarget;
+        const id = target?.dataset?.id;
+        navigate(`/ingredientes/editar-ingrediente/${id}`)
     }
 
     const ingredientesFiltrados = listadoIngredientes.filter(ingrediente =>
@@ -97,9 +100,13 @@ export const IngredientesPage = () => {
                     </button>
                 </div>
             </div>
-            {creationSucceded && showCreationAlert && (<div class="alert alert-info d-flex justify-content-between" role="alert">
-                Ingrediente creado correctamente
-                <button type="button" className="btn-close justify-self-end" aria-label="Close" onClick={handleCloseAlert}></button>
+            {(showCreationAlert || showModificationAlert) && (<div class="alert alert-info d-flex justify-content-between" role="alert">
+                {showCreationAlert ? 'Ingrediente creado correctamente' : 'Ingrediente modificado correctamente'}
+                <button type="button" className="btn-close btn-sm justify-self-end" aria-label="Close" onClick={handleCloseAlert}></button>
+            </div>)}
+            {showEliminationAlert && (<div class="alert alert-info d-flex justify-content-between" role="alert">
+                Ingrediente eliminado correctamente
+                <button type="button" className="btn-close btn-sm justify-self-end" aria-label="Close" onClick={handleCloseAlert}></button>
             </div>)}
             <div className='table-responsive fixed-table overflow-auto mb-3'>
                 <table className='table table-striped table-bordered text-center align-middle'>
@@ -114,7 +121,12 @@ export const IngredientesPage = () => {
                             <tr>
                                 <td scope='row'>{ingrediente.nombre}</td>
                                 <td>
-                                    <button className='btn btn-danger' data-id={ingrediente.id} onClick={handleEliminarIngrediente}>
+                                    <button className={`btn btn-primary me-2 ${isMobile ? 'btn-sm' : ''}`} data-id={ingrediente.id} onClick={handleEditarIngrediente}>
+                                        {
+                                            isMobile ? (<i class="bi bi-pencil-square"></i>) : ('Editar')
+                                        }
+                                    </button>
+                                    <button className={`btn btn-danger ${isMobile ? 'btn-sm' : ''}`} data-id={ingrediente.id} onClick={handleEliminarIngrediente}>
                                         {
                                             isMobile ? (<i className="bi bi-trash"></i>) : ('Borrar')
                                         }

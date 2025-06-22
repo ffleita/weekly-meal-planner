@@ -10,6 +10,7 @@ import { EditarRecetaPage } from '../pages/EditarRecetaPage'
 import { PlanesPage } from '../pages/PlanesPage'
 import { PlanDetailPage } from '../pages/PlanDetailPage'
 import { FormularioNuevoIngrediente } from '../components/FormularioNuevoIngrediente'
+import { EditarIngredientePage } from '../pages/EditarIngredientePage'
 
 export const AppRoutes = () => {
     return (
@@ -22,6 +23,7 @@ export const AppRoutes = () => {
             <Route path='/recetas/editar-receta/:idReceta' element={<EditarRecetaPage />} />
             <Route path='/ingredientes' element={<IngredientesPage />} />
             <Route path='/ingredientes/crear-ingrediente' element={<FormularioNuevoIngrediente />} />
+            <Route path='/ingredientes/editar-ingrediente/:idIngrediente' element={<EditarIngredientePage />} />
             <Route path='/planes' element={<PlanesPage />} />
             <Route path='/planes/:idPlan' element={<PlanDetailPage />} />
         </Routes>
