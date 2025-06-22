@@ -74,7 +74,6 @@ export const CrearRecetaPage = () => {
         e.preventDefault();
         setIsCreationInProgress(true);
         setFormSubmitted(true);
-        const target = e.currentTarget;
         setIsCreationInProgress(false);
         if (!isFormValid) return;
         console.log(formState);
