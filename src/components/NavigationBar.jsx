@@ -1,10 +1,17 @@
 import React from 'react'
-import { NavLink } from 'react-router-dom'
-import { useIsMobile } from '../hooks/isMobile'
+import { NavLink, useNavigate } from 'react-router-dom'
+import api from '../api/axiosInstance'
 
 export const NavigationBar = () => {
 
-    const isMobile = useIsMobile();
+    const navigate = useNavigate();
+
+    const handleLogout = (e) => {
+        e.preventDefault();
+        api.post('/auth/logout')
+        localStorage.removeItem('token');
+        navigate('/login');
+    }
 
     return (
         <nav className="navbar navbar-dark bg-dark">
@@ -36,6 +43,9 @@ export const NavigationBar = () => {
                                         <hr className="dropdown-divider" />
                                     </li> */}
                         </ul>
+                        <div className=''>
+                            <button type='button' className='btn btn-outline-danger w-100' onClick={handleLogout}>Cerrar sesion</button>
+                        </div>
                     </div>
                 </div>
             </div>
