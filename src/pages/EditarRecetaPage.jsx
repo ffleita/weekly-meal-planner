@@ -34,9 +34,6 @@ export const EditarRecetaPage = () => {
     const [ingredienteRepetido, setIngredienteRepetido] = useState('');
     const [onEditionError, setOnEditionError] = useState('');
 
-    // consulta via api por el idReceta si existe en la BD
-    // si existe lo carga, suponemos que si existe
-
     useEffect(() => {
         fetchPageData();
     }, [])
