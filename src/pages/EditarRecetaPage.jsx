@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { PrivatePagesLayout } from '../layouts/PrivatePagesLayout';
 import { useForm } from '../hooks/useForm';
+import api from "../api/axiosInstance";
 
 const formValidations = {
     nombre: [(value) => value.length >= 1, 'El nombre es obligatorio.'],
@@ -15,82 +16,69 @@ const initialFormIngredientes = {
     medida: ''
 }
 
-const ingredientes = [
-    {
-        id: 1,
-        nombre: 'zanahoria'
-    },
-    {
-        id: 2,
-        nombre: 'brocoli'
-    },
-    {
-        id: 3,
-        nombre: 'leche'
-    },
-    {
-        id: 4,
-        nombre: 'milanesa'
-    }
-]
-
-const medidas = [
-    'mg',
-    'g',
-    'kg',
-    'unidad',
-    'ml',
-    'l',
-    'kl'
-]
+const initialForm = {
+    nombre: '',
+    ingredientesReceta: [],
+    pasos: ''
+}
 
 export const EditarRecetaPage = () => {
 
     const { idReceta } = useParams();
 
+    const [ingredientes, setIngredientes] = useState([]);
+    const [medidas, setMedidas] = useState([]);
+    const [onLoadError, setOnLoadError] = useState('');
+    const [formSubmitted, setFormSubmitted] = useState(false);
+    const [isEditionInProgress, setIsEditionInProgress] = useState(false);
+    const [ingredienteRepetido, setIngredienteRepetido] = useState('');
+    const [onEditionError, setOnEditionError] = useState('');
+
     // consulta via api por el idReceta si existe en la BD
     // si existe lo carga, suponemos que si existe
-    const initialForm = {
-        nombre: 'Sopa de garrote',
-        ingredientesReceta: [
-            {
-                ingrediente: 1,
-                cantidad: 2,
-                medida: 'unidad'
-            }
-        ],
-        pasos: 'Nisi esse excepteur fugiat eu.'
+
+    useEffect(() => {
+        fetchPageData();
+    }, [])
+
+    const fetchPageData = async () => {
+        try {
+            const recetasResponse = await api.get(`/recetas/${idReceta}`);
+            setFormState(recetasResponse.data);
+            const ingredientesResp = await api.get('/ingredientes');
+            setIngredientes(ingredientesResp.data.ingredientes);
+            const medidasResp = await api.get('/medidas');
+            setMedidas(medidasResp.data);
+        } catch (error) {
+            setOnLoadError(error.response.data);
+        }
     }
 
     const { nombre, ingredientesReceta, pasos, formState, isFormValid, nombreValid
-        , pasosValid, onInputChange, onResetForm, setFormState } = useForm(initialForm, formValidations);
+        , pasosValid, onInputChange, setFormState } = useForm(initialForm, formValidations);
 
     const { ingrediente, medida, cantidad, formState: formStateIngredientes
         , onInputChange: onInputChangeIngredientes, onResetForm: onResetFormIngredientes } = useForm(initialFormIngredientes);
 
     const navigate = useNavigate();
 
-    const [formSubmitted, setFormSubmitted] = useState(false);
-
-    const [isCreationInProgress, setIsCreationInProgress] = useState(false);
-
-    const [ingredienteRepetido, setIngredienteRepetido] = useState('');
-
     const handleGoBack = (e) => {
         e.preventDefault();
         navigate(-1);
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsCreationInProgress(true);
+        setIsEditionInProgress(true);
         setFormSubmitted(true);
-        const target = e.currentTarget;
-        setIsCreationInProgress(false);
         if (!isFormValid) return;
-        console.log(formState);
-        onResetForm();
-        navigate(-1);
+        try {
+            await api.put(`/recetas/${idReceta}`, formState);
+            navigate('/recetas?modificationSucceded=true')
+        } catch (error) {
+            setOnEditionError(error.response.data);
+        }
+        setIsEditionInProgress(false);
     }
 
     const handleAgregarIngredienteAReceta = (e) => {
@@ -103,19 +91,45 @@ export const EditarRecetaPage = () => {
             setIngredienteRepetido(ingredientes.find(el => el.id == formStateIngredientes.ingrediente).nombre);
             return;
         }
-
-        ingredientesReceta.push(formStateIngredientes);
+        setFormState({
+            ...formState,
+            ingredientesReceta: [...ingredientesReceta, formStateIngredientes]
+        });
         console.log(ingredientesReceta);
         onResetFormIngredientes();
     }
 
     const handleRemoverElemento = (e) => {
         e.preventDefault();
-        const idIngrediente = e.currentTarget.dataset.id;
-        setFormState({
-            ...formState,
-            ingredientesReceta: ingredientesReceta.filter(ingrediente => ingrediente.ingrediente !== idIngrediente)
-        })
+        const idIngrediente = Number(e.target.dataset.id);
+
+        setFormState(prevState => ({
+            ...prevState,
+            ingredientesReceta: prevState.ingredientesReceta.filter(
+                ing => Number(ing.ingrediente) !== idIngrediente
+            )
+        }))
+    }
+
+    if (!initialForm) {
+        return (
+            <PrivatePagesLayout>
+                <div className="alert alert-info text-center">
+                    Cargando datos de la receta...
+                </div>
+            </PrivatePagesLayout>
+        );
+    }
+
+    if (onLoadError) {
+        return (
+            <PrivatePagesLayout>
+                <div className="alert alert-info text-center">
+                    {onLoadError}
+                </div>
+                <button type="button" className='btn btn-secondary' onClick={() => { navigate(-1) }}>Regresar</button>
+            </PrivatePagesLayout>
+        )
     }
 
     return (
@@ -123,6 +137,7 @@ export const EditarRecetaPage = () => {
             <br />
             <h1>Recetas</h1>
             <hr />
+            {onEditionError && (<div class="alert alert-danger" role="alert">{onEditionError}</div>)}
             <form onSubmit={handleSubmit} className='container g-4'>
                 <div className="row mb-3">
                     <div className='col'>
@@ -178,7 +193,7 @@ export const EditarRecetaPage = () => {
                         >
                             <option value="">Seleccione</option>
                             {medidas.map(m => (
-                                <option key={m} value={m}>{m}</option>
+                                <option key={m.id} value={m.id}>{m.nombre}</option>
                             ))}
                         </select>
                     </div>
@@ -192,7 +207,7 @@ export const EditarRecetaPage = () => {
                     <div className='col'>
                         {ingredienteRepetido && (
                             <div
-                                class="alert alert-warning text-center"
+                                className="alert alert-warning text-center"
                                 role="alert"
                             >
                                 Ya agrego <strong>{ingredienteRepetido}</strong> a sus ingredientes, no se admiten repetidos.
@@ -216,8 +231,8 @@ export const EditarRecetaPage = () => {
                             <ul className='list-group'>
                                 {
                                     ingredientesReceta.map(ingrediente => (
-                                        <li className='list-group-item d-flex justify-content-between'>
-                                            {`${ingredientes.find(el => el.id == ingrediente.ingrediente).nombre} - ${ingrediente.cantidad} ${ingrediente.medida}`}
+                                        <li className='list-group-item d-flex justify-content-between' key={ingrediente.ingrediente}>
+                                            {`${ingredientes.find(el => el.id == ingrediente.ingrediente)?.nombre} - ${ingrediente.cantidad} ${medidas.find(m => m.id == ingrediente.medida)?.nombre}`}
                                             <button data-id={ingrediente.ingrediente} type='button' className='btn btn-close' onClick={handleRemoverElemento}></button>
                                         </li>
                                     ))
@@ -244,7 +259,7 @@ export const EditarRecetaPage = () => {
 
                 <div className=' row d-flex justify-content-end g-2'>
                     <div className='col-sm-12 col-md-2'>
-                        <button type='submit' className='btn btn-primary w-100' disabled={isCreationInProgress}>Crear receta</button>
+                        <button type='submit' className='btn btn-primary w-100' disabled={isEditionInProgress}>Guardar cambios</button>
                     </div>
                     <div className='col-sm-12 col-md-2'>
                         <button type='button' className='btn btn-secondary w-100' onClick={handleGoBack}>Regresar</button>

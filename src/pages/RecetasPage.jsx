@@ -16,6 +16,7 @@ export const RecetasPage = () => {
     const [listadoRecetas, setListadoRecetas] = useState([]);
     const [loadingError, setLoadingError] = useState("");
     const [showCreationAlert, setShowCreationAlert] = useState(!!params.get('creationSucceded'))
+    const [showModificationAlert, setShowModificationAlert] = useState(!!params.get('modificationSucceded'))
     const [showEliminationAlert, setShowEliminationAlert] = useState(false);
 
 
@@ -82,7 +83,7 @@ export const RecetasPage = () => {
         e.preventDefault();
         setParams({});
         setShowCreationAlert(false);
-        // setShowModificationAlert(false);
+        setShowModificationAlert(false);
         setShowEliminationAlert(false);
     }
 
@@ -92,11 +93,15 @@ export const RecetasPage = () => {
             <h1>Recetas</h1>
             <hr />
             {showCreationAlert && (<div class="alert alert-info d-flex justify-content-between" role="alert">
-                Ingrediente creado correctamente
+                Receta creada correctamente
                 <button type="button" className="btn-close btn-sm justify-self-end" aria-label="Close" onClick={handleCloseAlert}></button>
             </div>)}
             {showEliminationAlert && (<div class="alert alert-info d-flex justify-content-between" role="alert">
-                Ingrediente eliminado correctamente
+                Receta eliminada correctamente
+                <button type="button" className="btn-close btn-sm justify-self-end" aria-label="Close" onClick={handleCloseAlert}></button>
+            </div>)}
+            {showModificationAlert && (<div class="alert alert-info d-flex justify-content-between" role="alert">
+                Receta modificada correctamente
                 <button type="button" className="btn-close btn-sm justify-self-end" aria-label="Close" onClick={handleCloseAlert}></button>
             </div>)}
             <div className='row g-2 align-items-center mb-3'>
