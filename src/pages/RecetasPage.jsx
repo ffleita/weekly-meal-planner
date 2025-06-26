@@ -16,6 +16,7 @@ export const RecetasPage = () => {
     const [listadoRecetas, setListadoRecetas] = useState([]);
     const [loadingError, setLoadingError] = useState("");
     const [showCreationAlert, setShowCreationAlert] = useState(!!params.get('creationSucceded'))
+    const [showEliminationAlert, setShowEliminationAlert] = useState(false);
 
 
     const updateListadoRecetas = async() => {
@@ -46,6 +47,19 @@ export const RecetasPage = () => {
         navigate(`/recetas/${e.target.dataset.id}`);
     }
 
+    const handleClickEliminarReceta = async(e) => {
+        e.preventDefault();
+        if (!e.target.dataset.id) return;
+
+        try {
+            await api.delete(`/recetas/${e.target.dataset.id}`);
+            updateListadoRecetas();
+            setShowEliminationAlert(true);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value);
     }
@@ -69,7 +83,7 @@ export const RecetasPage = () => {
         setParams({});
         setShowCreationAlert(false);
         // setShowModificationAlert(false);
-        // setShowEliminationAlert(false);
+        setShowEliminationAlert(false);
     }
 
     return (
@@ -79,6 +93,10 @@ export const RecetasPage = () => {
             <hr />
             {showCreationAlert && (<div class="alert alert-info d-flex justify-content-between" role="alert">
                 Ingrediente creado correctamente
+                <button type="button" className="btn-close btn-sm justify-self-end" aria-label="Close" onClick={handleCloseAlert}></button>
+            </div>)}
+            {showEliminationAlert && (<div class="alert alert-info d-flex justify-content-between" role="alert">
+                Ingrediente eliminado correctamente
                 <button type="button" className="btn-close btn-sm justify-self-end" aria-label="Close" onClick={handleCloseAlert}></button>
             </div>)}
             <div className='row g-2 align-items-center mb-3'>
@@ -110,7 +128,7 @@ export const RecetasPage = () => {
                                 <ul class="dropdown-menu">
                                     <li><a className='dropdown-item' data-id={receta.id} onClick={handleClickVerInfo}>Ver detalle</a></li>
                                     <li><a className='dropdown-item' data-id={receta.id} onClick={handleClickEditarReceta}>Editar receta</a></li>
-                                    <li><a className='dropdown-item' >Eliminar</a></li>
+                                    <li><a className='dropdown-item' data-id={receta.id} onClick={handleClickEliminarReceta}>Eliminar receta</a></li>
                                 </ul>
                             </div>
                         </li>
