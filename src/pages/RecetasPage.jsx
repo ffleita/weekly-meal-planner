@@ -1,20 +1,22 @@
 import React, { useEffect, useState } from 'react'
 import { PrivatePagesLayout } from '../layouts/PrivatePagesLayout'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useIsMobile } from '../hooks/isMobile'
 import api from '../api/axiosInstance'
 
 export const RecetasPage = () => {
 
+    const [params, setParams] = useSearchParams();
+
     const navigate = useNavigate();
 
     const isMobile = useIsMobile();
 
-    const [searchTerm, setSearchTerm] = useState('')
+    const [searchTerm, setSearchTerm] = useState('');
+    const [listadoRecetas, setListadoRecetas] = useState([]);
+    const [loadingError, setLoadingError] = useState("");
+    const [showCreationAlert, setShowCreationAlert] = useState(!!params.get('creationSucceded'))
 
-    const [listadoRecetas, setListadoRecetas] = useState([])
-
-    const [loadingError, setLoadingError] = useState("")
 
     const updateListadoRecetas = async() => {
         try {
@@ -62,11 +64,23 @@ export const RecetasPage = () => {
         navigate(-1);
     }
 
+    const handleCloseAlert = (e) => {
+        e.preventDefault();
+        setParams({});
+        setShowCreationAlert(false);
+        // setShowModificationAlert(false);
+        // setShowEliminationAlert(false);
+    }
+
     return (
         <PrivatePagesLayout>
             <br />
             <h1>Recetas</h1>
             <hr />
+            {showCreationAlert && (<div class="alert alert-info d-flex justify-content-between" role="alert">
+                Ingrediente creado correctamente
+                <button type="button" className="btn-close btn-sm justify-self-end" aria-label="Close" onClick={handleCloseAlert}></button>
+            </div>)}
             <div className='row g-2 align-items-center mb-3'>
                 <div className='col-10'>
                     <input
