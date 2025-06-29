@@ -2,30 +2,31 @@ import React, { useState } from 'react'
 import { PrivatePagesLayout } from '../layouts/PrivatePagesLayout'
 import { useIsMobile } from '../hooks/isMobile';
 import { useNavigate } from 'react-router-dom';
-
-
-const listadoPlanes = [
-    {
-        id: 1,
-        nombre: 'Semana ful proteinas'
-    },
-    {
-        id: 2,
-        nombre: 'Bajo en carbohidratos'
-    },
-    {
-        id: 3,
-        nombre: 'Alto en carbohidratos'
-    },
-    {
-        id: 4,
-        nombre: 'Alto en carbohidratos 2'
-    }
-]
+import api from '../api/axiosInstance'
+import { useEffect } from 'react';
 
 export const PlanesPage = () => {
 
     const [searchTerm, setSearchTerm] = useState('');
+    const [listadoPlanes, setListadoPlanes] = useState([]);
+    const [fetchError, setFetchError] = useState('');
+
+    useEffect(() => {
+        const fetchData = async() => {
+            try {
+                const response = await api.get('/planes');
+                console.log(response);
+                setListadoPlanes(response.data);
+            } catch (error) {
+                console.log(error);
+                
+                setFetchError(error.message);
+            }
+        }
+
+        fetchData();
+    }, [])
+    
 
     const isMobile = useIsMobile();
 
@@ -35,13 +36,29 @@ export const PlanesPage = () => {
         setSearchTerm(e.target.value);
     }
 
-    const listadoPlanesFiltrado = listadoPlanes.filter(plan => plan.nombre.toLowerCase().includes(searchTerm.toLowerCase()));
+    const listadoPlanesFiltrado = listadoPlanes?.filter(plan => plan.descripcion.toLowerCase().includes(searchTerm.toLowerCase()));
 
     const handleVerDetallePlan = (e) => {
         e.preventDefault();
         const planId = e.currentTarget.dataset.id;
         if (!planId) return;
         navigate(`/planes/${planId}`);
+    }
+
+    const handleGoBack = (e) => {
+        e.preventDefault;
+        navigate(-1);
+    }
+
+    if (fetchError) {
+        return (
+            <PrivatePagesLayout>
+                <div class="alert alert-danger mt-2" role="alert">{fetchError}</div>
+                <div className='d-flex justify-content-end'>
+                    <button type="button" className='btn btn-secondary' onClick={handleGoBack}>Regresar</button>
+                </div>
+            </PrivatePagesLayout>
+        )
     }
 
 
@@ -68,9 +85,9 @@ export const PlanesPage = () => {
             </div>
             <div className='tbl-fixed mb-3'>
                 <ul className='list-group'>
-                    {listadoPlanesFiltrado.map(plan => (
+                    {listadoPlanesFiltrado?.map(plan => (
                         <li className='list-group-item d-flex align-items-center justify-content-between' key={plan.id}>
-                            <div className='flex-grow-1 pe-3'>{plan.nombre}</div>
+                            <div className='flex-grow-1 pe-3'>{plan.descripcion}</div>
                             <div class="col-2 dropdown">
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     {isMobile ? (<i class="bi bi-three-dots-vertical"></i>) : 'Acciones'}
