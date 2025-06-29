@@ -15,11 +15,8 @@ export const PlanesPage = () => {
         const fetchData = async() => {
             try {
                 const response = await api.get('/planes');
-                console.log(response);
                 setListadoPlanes(response.data);
             } catch (error) {
-                console.log(error);
-                
                 setFetchError(error.message);
             }
         }
@@ -54,13 +51,14 @@ export const PlanesPage = () => {
         return (
             <PrivatePagesLayout>
                 <div class="alert alert-danger mt-2" role="alert">{fetchError}</div>
-                <div className='d-flex justify-content-end'>
-                    <button type="button" className='btn btn-secondary' onClick={handleGoBack}>Regresar</button>
+                <div className='row d-flex justify-content-end'>
+                    <div className='col-sm-12 col-md-2'>
+                        <button type='button' className='btn btn-secondary w-100' onClick={handleGoBack}>Regresar</button>
+                    </div>
                 </div>
             </PrivatePagesLayout>
         )
     }
-
 
     return (
         <PrivatePagesLayout>
@@ -104,7 +102,7 @@ export const PlanesPage = () => {
             </div>
             <div className='row d-flex justify-content-end'>
                 <div className='col-sm-12 col-md-2'>
-                    <button type='button' className='btn btn-secondary w-100'>Regresar</button>
+                    <button type='button' className='btn btn-secondary w-100' onClick={handleGoBack}>Regresar</button>
                 </div>
             </div>
         </PrivatePagesLayout>
