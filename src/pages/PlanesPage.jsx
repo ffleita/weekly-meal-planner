@@ -22,7 +22,9 @@ export const PlanesPage = () => {
                 const response = await api.get('/planes');
                 setListadoPlanes(response.data);
             } catch (error) {
-                setFetchError(error.message);
+                console.log(error);
+                
+                setFetchError(error.response.data);
             }
         }
 
@@ -60,24 +62,12 @@ export const PlanesPage = () => {
         e.preventDefault();
         setDeletionError('');
         setDeletionSuccess(false);
+        setFetchError('');
     }
 
     const handleGoBack = (e) => {
         e.preventDefault;
         navigate(-1);
-    }
-
-    if (fetchError) {
-        return (
-            <PrivatePagesLayout>
-                <div className="alert alert-danger mt-2" role="alert">{fetchError}</div>
-                <div className='row d-flex justify-content-end'>
-                    <div className='col-sm-12 col-md-2'>
-                        <button type='button' className='btn btn-secondary w-100' onClick={handleGoBack}>Regresar</button>
-                    </div>
-                </div>
-            </PrivatePagesLayout>
-        )
     }
 
     return (
@@ -102,19 +92,25 @@ export const PlanesPage = () => {
                 </div>
             </div>
             {deletionError && (
-                <div className="alert d-flex alert-danger" role="alert">
+                <div className="alert d-flex alert-danger justify-content-between" role="alert">
                     {deletionError}
-                    <button type="button" className="btn-close btn-sm justify-self-end" aria-label="Close" onClick={handleCloseAlert}></button>
+                    <button type="button" className="btn-close btn-sm" aria-label="Close" onClick={handleCloseAlert}></button>
                 </div>
                 )
             }
             {deletionSuccess && (
-                <div className="alert d-flex alert-success" role="alert">
+                <div className="alert d-flex alert-success justify-content-between" role="alert">
                     El plan fue eliminado correctamente.
-                    <button type="button" className="btn-close btn-sm justify-self-end" aria-label="Close" onClick={handleCloseAlert}></button>
+                    <button type="button" className="btn-close btn-sm" aria-label="Close" onClick={handleCloseAlert}></button>
                 </div>
                 )
             }
+            {fetchError && (
+                <div className="alert d-flex alert-danger justify-content-between" role="alert">
+                    {fetchError}
+                    <button type="button" className="btn-close btn-sm" aria-label="Close" onClick={handleCloseAlert}></button>
+                </div>
+            )}
             <div className='tbl-fixed mb-3'>
                 <ul className='list-group'>
                     {listadoPlanesFiltrado?.map(plan => (
