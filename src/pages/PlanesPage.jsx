@@ -17,7 +17,7 @@ export const PlanesPage = () => {
         fetchData();
     }, [])
     
-        const fetchData = async() => {
+    const fetchData = async() => {
             try {
                 const response = await api.get('/planes');
                 setListadoPlanes(response.data);
@@ -25,10 +25,6 @@ export const PlanesPage = () => {
                 setFetchError(error.message);
             }
         }
-
-        fetchData();
-    }, [])
-    
 
     const isMobile = useIsMobile();
 
@@ -124,11 +120,11 @@ export const PlanesPage = () => {
                     {listadoPlanesFiltrado?.map(plan => (
                         <li className='list-group-item d-flex align-items-center justify-content-between' key={plan.id}>
                             <div className='flex-grow-1 pe-3'>{plan.descripcion}</div>
-                            <div class="col-2 dropdown">
-                                <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    {isMobile ? (<i class="bi bi-three-dots-vertical"></i>) : 'Acciones'}
+                            <div className="col-2 dropdown">
+                                <button className="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    {isMobile ? (<i className="bi bi-three-dots-vertical"></i>) : 'Acciones'}
                                 </button>
-                                <ul class="dropdown-menu">
+                                <ul className="dropdown-menu">
                                     <li><a className='dropdown-item' data-id={plan.id} onClick={handleVerDetallePlan}>Ver detalle</a></li>
                                     <li><a className='dropdown-item'>Editar receta</a></li>
                                     <li><a className='dropdown-item' data-id={plan.id} onClick={handleEliminarPlan}>Eliminar</a></li>
