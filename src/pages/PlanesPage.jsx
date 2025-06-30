@@ -10,8 +10,13 @@ export const PlanesPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [listadoPlanes, setListadoPlanes] = useState([]);
     const [fetchError, setFetchError] = useState('');
+    const [deletionError, setDeletionError] = useState('');
+    const [deletionSuccess, setDeletionSuccess] = useState(false);
 
     useEffect(() => {
+        fetchData();
+    }, [])
+    
         const fetchData = async() => {
             try {
                 const response = await api.get('/planes');
@@ -42,6 +47,25 @@ export const PlanesPage = () => {
         navigate(`/planes/${planId}`);
     }
 
+    const handleEliminarPlan = async(e) => {
+        try {
+            e.preventDefault();
+            const planId = e.currentTarget.dataset.id;
+            if (!planId) return;
+            await api.delete(`/planes/${planId}`);
+            setDeletionSuccess(true);
+            fetchData();
+        } catch (error) {
+            setDeletionError(error.response.data);
+        }
+    }
+
+    const handleCloseAlert = (e) => {
+        e.preventDefault();
+        setDeletionError('');
+        setDeletionSuccess(false);
+    }
+
     const handleGoBack = (e) => {
         e.preventDefault;
         navigate(-1);
@@ -50,7 +74,7 @@ export const PlanesPage = () => {
     if (fetchError) {
         return (
             <PrivatePagesLayout>
-                <div class="alert alert-danger mt-2" role="alert">{fetchError}</div>
+                <div className="alert alert-danger mt-2" role="alert">{fetchError}</div>
                 <div className='row d-flex justify-content-end'>
                     <div className='col-sm-12 col-md-2'>
                         <button type='button' className='btn btn-secondary w-100' onClick={handleGoBack}>Regresar</button>
@@ -81,6 +105,20 @@ export const PlanesPage = () => {
                     </button>
                 </div>
             </div>
+            {deletionError && (
+                <div className="alert d-flex alert-danger" role="alert">
+                    {deletionError}
+                    <button type="button" className="btn-close btn-sm justify-self-end" aria-label="Close" onClick={handleCloseAlert}></button>
+                </div>
+                )
+            }
+            {deletionSuccess && (
+                <div className="alert d-flex alert-success" role="alert">
+                    El plan fue eliminado correctamente.
+                    <button type="button" className="btn-close btn-sm justify-self-end" aria-label="Close" onClick={handleCloseAlert}></button>
+                </div>
+                )
+            }
             <div className='tbl-fixed mb-3'>
                 <ul className='list-group'>
                     {listadoPlanesFiltrado?.map(plan => (
@@ -93,7 +131,7 @@ export const PlanesPage = () => {
                                 <ul class="dropdown-menu">
                                     <li><a className='dropdown-item' data-id={plan.id} onClick={handleVerDetallePlan}>Ver detalle</a></li>
                                     <li><a className='dropdown-item'>Editar receta</a></li>
-                                    <li><a className='dropdown-item'>Eliminar</a></li>
+                                    <li><a className='dropdown-item' data-id={plan.id} onClick={handleEliminarPlan}>Eliminar</a></li>
                                 </ul>
                             </div>
                         </li>
